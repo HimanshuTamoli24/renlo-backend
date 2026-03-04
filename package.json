@@ -1,10 +1,9 @@
 {
   "name": "renlo-backend",
-  "module": "index.ts",
   "type": "module",
   "private": true,
   "scripts": {
-    "start": "bun run build && bun run start:prod",
+    "start": "node dist/index.js",
     "start:dev": "nodemon --watch src --ext ts --exec \"bun src/server.ts\"",
     "start:prod": "node dist/index.js",
     "build": "tsc",
