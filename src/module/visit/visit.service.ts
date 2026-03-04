@@ -2,6 +2,9 @@ import Listing from '../listing/listing.model';
 import Visit from './visit.model';
 import { ApiError } from '../../utils/api.error';
 import { getPagination } from '../../helper/query.builder';
+import { ensureLeaseFromApprovedVisit } from '../lease/lease.service';
+
+type VisitDecision = 'YES' | 'NO';
 
 const isSameId = (left: any, right: string) => String(left) === String(right);
 
@@ -145,7 +148,12 @@ export const markVisited = async (id: string, tenantId: string) => {
   return visit;
 };
 
-export const makeDecision = async (id: string, tenantId: string, notes?: string) => {
+export const makeDecision = async (
+  id: string,
+  tenantId: string,
+  decision: VisitDecision,
+  notes?: string,
+) => {
   const visit = await Visit.findById(id);
   if (!visit) throw new ApiError(404, 'Visit not found');
 
@@ -157,13 +165,29 @@ export const makeDecision = async (id: string, tenantId: string, notes?: string)
     throw new ApiError(400, 'Decision can be made only after visit is marked VISITED');
   }
 
+  visit.decision = decision;
   visit.decisionAt = new Date();
   if (notes) visit.notes = notes;
 
+  if (decision === 'YES') {
+    visit.status = 'APPROVED';
+    visit.moveInIntent = true;
+    visit.moveInRequestedAt = new Date();
+  } else {
+    visit.status = 'REJECTED';
+    visit.moveInIntent = false;
+    visit.moveInRequestedAt = undefined;
+  }
 
   await visit.save();
+
+  if (decision === 'YES') {
+    await ensureLeaseFromApprovedVisit(String(visit.tenant), String(visit.listing));
+  }
+
   return {
-    visit
+    visit,
+    nextAction: decision === 'YES' ? 'MOVE_IN' : 'NONE',
   };
 };
 

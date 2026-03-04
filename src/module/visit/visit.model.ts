@@ -7,6 +7,7 @@ export type VisitStatus =
   | 'APPROVED'
   | 'REJECTED'
   | 'CANCELLED';
+export type VisitDecision = 'YES' | 'NO';
 
 export interface IVisit {
   tenant: mongoose.Types.ObjectId;
@@ -16,6 +17,7 @@ export interface IVisit {
   scheduledDate?: Date;
   visitedAt?: Date;
   status: VisitStatus;
+  decision?: VisitDecision;
   decisionAt?: Date;
   notes?: string;
   moveInIntent: boolean;
@@ -34,6 +36,10 @@ const visitSchema = new Schema<IVisit>(
       type: String,
       enum: ['REQUESTED', 'SCHEDULED', 'VISITED', 'APPROVED', 'REJECTED', 'CANCELLED'],
       default: 'REQUESTED',
+    },
+    decision: {
+      type: String,
+      enum: ['YES', 'NO'],
     },
     decisionAt: { type: Date },
     notes: { type: String, trim: true },
