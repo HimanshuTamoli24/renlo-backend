@@ -1,7 +1,7 @@
-import mongoose, { Schema, Document, Model } from 'mongoose';
+import mongoose, { Schema, Model } from 'mongoose';
 import bcrypt from 'bcrypt';
 
-export interface IUser extends Document {
+export interface IUser {
   name: string;
   email: string;
   password: string;
@@ -21,15 +21,15 @@ export interface IUser extends Document {
   refreshTokenExpiry?: Date;
 }
 
-interface UserModel extends Model<IUser> {
-  hashPassword(password: string): Promise<string>;
-}
-
-interface UserDocument extends IUser, Document {
+interface IUserMethods {
   comparePassword(candidatePassword: string): Promise<boolean>;
 }
 
-const userSchema = new Schema<IUser, UserModel, UserDocument>(
+interface UserModel extends Model<IUser, {}, IUserMethods> {
+  hashPassword(password: string): Promise<string>;
+}
+
+const userSchema = new Schema<IUser, UserModel, IUserMethods>(
   {
     name: { type: String, required: true, trim: true },
 
