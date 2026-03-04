@@ -14,4 +14,7 @@ export const envs= {
   NODE_ENV: process.env.NODE_ENV ?? "development",
   PORT: Number(required("PORT")),
   MONGO_URI: required("MONGO_URI"),
+  JWT_SECRET: required("JWT_SECRET"),
+  JWT_EXPIRES_IN: required("JWT_EXPIRES_IN"), 
+
 };

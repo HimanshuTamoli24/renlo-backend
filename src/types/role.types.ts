@@ -1,4 +1,1 @@
-export interface Role {
-  id: string;
-  name: string;
-}
+export type Role = 'BIGBOSS' | 'OWNER' | 'TENANT';
