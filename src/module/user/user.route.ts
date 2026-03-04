@@ -5,11 +5,11 @@ import { roles } from '../../constant/role';
 import authorize from '../../middleware/auth.middleware';
 
 const router = Router();
-const { BIGBOSS } = roles;
+const { BIGBOSS, TENANT, OWNER } = roles;
 
 router.use(authorize());
 
-router.get('/', Protect([BIGBOSS]), getUsers);
+router.get('/', Protect([BIGBOSS, TENANT, OWNER]), getUsers);
 
 router.get('/:id', Protect([BIGBOSS]), getUser);
 
