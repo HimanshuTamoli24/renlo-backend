@@ -3,10 +3,9 @@
   "type": "module",
   "private": true,
   "scripts": {
-    "start": "node dist/index.js",
-    "start:dev": "nodemon --watch src --ext ts --exec \"bun src/server.ts\"",
-    "start:prod": "node dist/index.js",
+    "dev": "bun --watch src/server.ts",
     "build": "tsc",
+    "start": "bun dist/server.js",
     "lint": "eslint . --ext .ts",
     "format": "prettier --write ."
   },
