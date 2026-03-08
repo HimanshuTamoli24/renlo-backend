@@ -24,6 +24,13 @@ export const getAdminVisits = asyncHandler(async (req: Request, res: Response) =
     .json(new ApiResponse('Admin visits fetched successfully', result.data, result.meta));
 });
 
+export const getVisits = asyncHandler(async (req: Request, res: Response) => {
+  if (req.user.role === 'TENANT') {
+    return getMyVisits(req, res);
+  }
+  return getAdminVisits(req, res);
+});
+
 export const getVisitById = asyncHandler(async (req: Request, res: Response) => {
   const visit = await visitService.getVisitById(
     req.params.id as string,

@@ -47,7 +47,7 @@ export const register = asyncHandler(async (req: Request, res: Response) => {
       name: user.name,
       role: user.role,
       email: user.email,
-      accessToken: accessToken,
+      token: accessToken,
       refreshToken: refreshToken,
     }),
   );
@@ -60,11 +60,11 @@ export const login = asyncHandler(async (req: Request, res: Response) => {
   console.log('user', user);
   res.status(200).json(
     new ApiResponse('Login successful', {
-      _id:user._id,
+      _id: user._id,
       name: user.name,
       role: user.role,
       email: user.email,
-      accessToken: accessToken,
+      token: accessToken,
       refreshToken: refreshToken,
     }),
   );

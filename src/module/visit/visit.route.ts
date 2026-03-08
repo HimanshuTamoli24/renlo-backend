@@ -8,6 +8,7 @@ import {
   getAdminVisits,
   getMyVisits,
   getVisitById,
+  getVisits,
   makeDecision,
   markVisited,
   requestVisit,
@@ -24,7 +25,7 @@ const router = Router();
 const { BIGBOSS, OWNER, TENANT } = roles;
 
 router.use(authorize());
-
+router.get('/', Protect([BIGBOSS, OWNER, TENANT]), getVisits);
 router.post('/', Protect([TENANT]), validate(createVisitSchema), requestVisit);
 router.get('/my', Protect([TENANT]), getMyVisits);
 router.get('/incoming', Protect([BIGBOSS, OWNER]), getAdminVisits);
