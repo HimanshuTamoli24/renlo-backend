@@ -12,24 +12,26 @@ const setAuthCookies = (
 ) => {
   const isProduction = envs.NODE_ENV === 'production';
 
-  res.cookie('accessToken', accessToken, {
+  const cookieOptions = {
     httpOnly: true,
     secure: isProduction,
-    sameSite: 'lax',
+    sameSite: (isProduction ? 'none' : 'lax') as any,
+  };
+
+  res.cookie('accessToken', accessToken, {
+    ...cookieOptions,
     maxAge: 6 * 60 * 60 * 1000,
   });
 
   res.cookie('refreshToken', refreshToken, {
-    httpOnly: true,
-    secure: isProduction,
-    sameSite: 'lax',
+    ...cookieOptions,
     maxAge: 7 * 24 * 60 * 60 * 1000,
   });
 
   res.cookie('userRole', userRole, {
     httpOnly: false,
     secure: isProduction,
-    sameSite: 'lax',
+    sameSite: isProduction ? 'none' : 'lax',
     maxAge: 7 * 24 * 60 * 60 * 1000,
   });
 };
@@ -37,14 +39,16 @@ const setAuthCookies = (
 export const register = asyncHandler(async (req: Request, res: Response) => {
   const { user, accessToken, refreshToken } = await authService.register(req.body);
   setAuthCookies(res, accessToken, refreshToken, user.role);
-  res.status(201).json(new ApiResponse('Registered successfully', user));
+  res
+    .status(201)
+    .json(new ApiResponse('Registered successfully', { ...user, accessToken, refreshToken }));
 });
 
 export const login = asyncHandler(async (req: Request, res: Response) => {
   const { user, accessToken, refreshToken } = await authService.login(req.body);
   if (!user) throw new Error('User not found');
   setAuthCookies(res, accessToken, refreshToken, user.role);
-  res.status(200).json(new ApiResponse('Login successful', user));
+  res.status(200).json(new ApiResponse('Login successful', { ...user, accessToken, refreshToken }));
 });
 
 export const logout = asyncHandler(async (req: Request, res: Response) => {
