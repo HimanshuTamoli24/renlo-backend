@@ -9,17 +9,19 @@ import visitRoutes from './module/visit/visit.route';
 import leaseRoutes from './module/lease/lease.route';
 import { envs } from './config/env';
 const app = express();
+app.set('trust proxy', 1);
 app.use(
   cors({
     origin: [
-      "http://localhost:3000",
-      "http://localhost:7007",
-      "https://www.himanshutamoli.me",
-      "https://himanshutamoli.me"
+      'http://localhost:3000',
+      'http://localhost:7007',
+      'https://www.himanshutamoli.me',
+      'https://himanshutamoli.me',
     ],
     credentials: true,
-  })
-);app.use(helmet());
+  }),
+);
+app.use(helmet());
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 
