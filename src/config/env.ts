@@ -1,6 +1,7 @@
-import dotenv from "dotenv";
+import dotenv from 'dotenv';
 
-dotenv.config({ path: ".env.dev" }); // load once here
+const envFile = process.env.NODE_ENV === 'production' ? '.env.production' : '.env.dev';
+dotenv.config({ path: envFile });
 
 const required = (key: string): string => {
   const value = process.env[key];
@@ -10,11 +11,11 @@ const required = (key: string): string => {
   return value;
 };
 
-export const envs= {
-  NODE_ENV: process.env.NODE_ENV ?? "development",
-  PORT: Number(required("PORT")),
-  MONGO_URI: required("MONGO_URI"),
-  JWT_SECRET: required("JWT_SECRET"),
-  JWT_EXPIRES_IN: required("JWT_EXPIRES_IN"), 
-
+export const envs = {
+  NODE_ENV: (process.env.NODE_ENV ?? 'development').toLowerCase(),
+  PORT: Number(required('PORT')),
+  MONGO_URI: required('MONGO_URI'),
+  JWT_SECRET: required('JWT_SECRET'),
+  JWT_EXPIRES_IN: required('JWT_EXPIRES_IN'),
+  FRONTEND_URL: required('FRONTEND_URL'),
 };

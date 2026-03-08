@@ -7,9 +7,9 @@ import authRoutes from './module/auth/auth.route';
 import listingRoutes from './module/listing/listing.route';
 import visitRoutes from './module/visit/visit.route';
 import leaseRoutes from './module/lease/lease.route';
-
+import { envs } from './config/env';
 const app = express();
-app.use(cors({ origin: true, credentials: true }));
+app.use(cors({ origin: envs.FRONTEND_URL, credentials: true }));
 app.use(helmet());
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
