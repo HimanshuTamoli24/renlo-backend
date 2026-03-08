@@ -9,8 +9,17 @@ import visitRoutes from './module/visit/visit.route';
 import leaseRoutes from './module/lease/lease.route';
 import { envs } from './config/env';
 const app = express();
-app.use(cors({ origin: envs.FRONTEND_URL, credentials: true }));
-app.use(helmet());
+app.use(
+  cors({
+    origin: [
+      "http://localhost:3000",
+      "http://localhost:7007",
+      "https://www.himanshutamoli.me",
+      "https://himanshutamoli.me"
+    ],
+    credentials: true,
+  })
+);app.use(helmet());
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 

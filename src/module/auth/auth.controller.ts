@@ -16,8 +16,9 @@ const setAuthCookies = (
     httpOnly: true,
     secure: isProduction,
     sameSite: (isProduction ? 'none' : 'lax') as any,
+     domain: isProduction ? ".himanshutamoli.me" : undefined,
   };
-
+  console.log("cookieOptions",cookieOptions);
   res.cookie('accessToken', accessToken, {
     ...cookieOptions,
     maxAge: 6 * 60 * 60 * 1000,
@@ -38,6 +39,7 @@ const setAuthCookies = (
 
 export const register = asyncHandler(async (req: Request, res: Response) => {
   const { user, accessToken, refreshToken } = await authService.register(req.body);
+  console.log("user",setAuthCookies);
   setAuthCookies(res, accessToken, refreshToken, user.role);
   res
     .status(201)
@@ -46,6 +48,7 @@ export const register = asyncHandler(async (req: Request, res: Response) => {
 
 export const login = asyncHandler(async (req: Request, res: Response) => {
   const { user, accessToken, refreshToken } = await authService.login(req.body);
+  console.log("user",setAuthCookies);
   if (!user) throw new Error('User not found');
   setAuthCookies(res, accessToken, refreshToken, user.role);
   res.status(200).json(new ApiResponse('Login successful', { ...user, accessToken, refreshToken }));
