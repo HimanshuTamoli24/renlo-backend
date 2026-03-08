@@ -1,4 +1,4 @@
-import type { Request, Response } from 'express';
+import type { NextFunction, Request, Response } from 'express';
 import { asyncHandler } from '../../utils/async.handler';
 import { ApiResponse } from '../../utils/api.response';
 import * as visitService from './visit.service';
@@ -24,11 +24,11 @@ export const getAdminVisits = asyncHandler(async (req: Request, res: Response) =
     .json(new ApiResponse('Admin visits fetched successfully', result.data, result.meta));
 });
 
-export const getVisits = asyncHandler(async (req: Request, res: Response) => {
+export const getVisits = asyncHandler(async (req: Request, res: Response, next: NextFunction) => {
   if (req.user.role === 'TENANT') {
-    return getMyVisits(req, res);
+    return getMyVisits(req, res, next);
   }
-  return getAdminVisits(req, res);
+  return getAdminVisits(req, res, next);
 });
 
 export const getVisitById = asyncHandler(async (req: Request, res: Response) => {
