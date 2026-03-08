@@ -11,8 +11,8 @@ const isSameId = (left: any, right: string) => String(left) === String(right);
 export const requestVisit = async (data: any, tenantId: string) => {
   const { listingId, requestedDate, notes } = data;
 
-  const listing = await Listing.findOne({ _id: listingId, status: 'PUBLISHED' }).lean();
-  if (!listing) throw new ApiError(404, 'Listing not found or not published');
+  const listing = await Listing.findOne({ _id: listingId, status: 'APPROVED' }).lean();
+  if (!listing) throw new ApiError(404, 'Listing not found or not approved');
 
   const existing = await Visit.findOne({
     tenant: tenantId,

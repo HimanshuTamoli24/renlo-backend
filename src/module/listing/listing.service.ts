@@ -3,10 +3,19 @@ import { ApiError } from '../../utils/api.error';
 import { getPagination } from '../../helper/query.builder';
 
 export const getListings = async (query: any) => {
-  const { page: pageQuery, limit: limitQuery, search, location, minRent, maxRent, availableFrom, amenity } = query;
+  const {
+    page: pageQuery,
+    limit: limitQuery,
+    search,
+    location,
+    minRent,
+    maxRent,
+    availableFrom,
+    amenity,
+  } = query;
   const { page, limit, skip } = getPagination(pageQuery as string, limitQuery as string);
 
-  const filter: Record<string, any> = { status: 'PUBLISHED' };
+  const filter: Record<string, any> = { status: 'APPROVED' };
 
   if (location) {
     filter.location = { $regex: String(location), $options: 'i' };
@@ -35,7 +44,11 @@ export const getListings = async (query: any) => {
   }
 
   const total = await Listing.countDocuments(filter);
-  const listings = await Listing.find(filter).sort({ createdAt: -1 }).skip(skip).limit(limit).lean();
+  const listings = await Listing.find(filter)
+    .sort({ createdAt: -1 })
+    .skip(skip)
+    .limit(limit)
+    .lean();
 
   return {
     success: true,
@@ -50,7 +63,7 @@ export const getListings = async (query: any) => {
 };
 
 export const getListing = async (id: string) => {
-  const listing = await Listing.findOne({ _id: id, status: 'PUBLISHED' }).lean();
+  const listing = await Listing.findOne({ _id: id, status: 'APPROVED' }).lean();
   if (!listing) throw new ApiError(404, 'Listing not found');
   return listing;
 };
@@ -58,7 +71,7 @@ export const getListing = async (id: string) => {
 export const compareListings = async (ids: string[]) => {
   if (!ids.length) throw new ApiError(400, 'Listing ids are required');
 
-  const listings = await Listing.find({ _id: { $in: ids }, status: 'PUBLISHED' }).lean();
+  const listings = await Listing.find({ _id: { $in: ids }, status: 'APPROVED' }).lean();
   return listings;
 };
 
@@ -70,7 +83,11 @@ export const getAdminListings = async (query: any) => {
   if (status) filter.status = status;
 
   const total = await Listing.countDocuments(filter);
-  const listings = await Listing.find(filter).sort({ createdAt: -1 }).skip(skip).limit(limit).lean();
+  const listings = await Listing.find(filter)
+    .sort({ createdAt: -1 })
+    .skip(skip)
+    .limit(limit)
+    .lean();
 
   return {
     success: true,
@@ -94,9 +111,9 @@ export const createListing = async (data: any, createdBy: string) => {
 };
 
 const allowedTransitions: Record<ListingStatus, ListingStatus[]> = {
-  DRAFT: ['REVIEW'],
-  REVIEW: ['DRAFT', 'PUBLISHED'],
-  PUBLISHED: ['REVIEW'],
+  DRAFT: ['APPROVED', 'REJECTED', 'DRAFT'],
+  APPROVED: ['DRAFT', 'REJECTED'],
+  REJECTED: ['DRAFT'],
 };
 
 export const updateListing = async (id: string, data: any) => {
@@ -122,4 +139,36 @@ export const updateListingStatus = async (id: string, status: ListingStatus) => 
 export const deleteListing = async (id: string) => {
   const listing = await Listing.findByIdAndDelete(id);
   if (!listing) throw new ApiError(404, 'Listing not found');
+};
+
+export const acceptListing = async (id: string) => {
+  const listing = await Listing.findById(id);
+  if (!listing) throw new ApiError(404, 'Listing not found');
+
+  const canMove = allowedTransitions[listing.status].includes('APPROVED');
+  if (!canMove) {
+    throw new ApiError(400, `Cannot accept listing from status ${listing.status}`);
+  }
+
+  listing.status = 'APPROVED';
+  listing.rejectionReason = undefined;
+  await listing.save();
+  return listing;
+};
+
+export const rejectListing = async (id: string, reason: string) => {
+  if (!reason) throw new ApiError(400, 'Rejection reason is required');
+
+  const listing = await Listing.findById(id);
+  if (!listing) throw new ApiError(404, 'Listing not found');
+
+  const canMove = allowedTransitions[listing.status].includes('REJECTED');
+  if (!canMove) {
+    throw new ApiError(400, `Cannot reject listing from status ${listing.status}`);
+  }
+
+  listing.status = 'REJECTED';
+  listing.rejectionReason = reason;
+  await listing.save();
+  return listing;
 };

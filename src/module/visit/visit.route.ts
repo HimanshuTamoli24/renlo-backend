@@ -27,6 +27,7 @@ router.use(authorize());
 
 router.post('/', Protect([TENANT]), validate(createVisitSchema), requestVisit);
 router.get('/my', Protect([TENANT]), getMyVisits);
+router.get('/incoming', Protect([BIGBOSS, OWNER]), getAdminVisits);
 router.get('/admin', Protect([BIGBOSS, OWNER]), getAdminVisits);
 router.get('/:id', Protect([BIGBOSS, OWNER, TENANT]), getVisitById);
 

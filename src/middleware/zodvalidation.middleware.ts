@@ -7,9 +7,13 @@ export const validate =
     const result = schema.safeParse(req[property]);
 
     if (!result.success) {
+      const issue = result.error.issues[0];
+      const field = issue?.path.join('.') || 'Field';
+      const message = issue?.message ?? 'Validation failed';
+
       return res.status(400).json({
         success: false,
-        message: result.error.issues[0]?.message ?? 'Validation failed',
+        message: `${field}: ${message}`,
       });
     }
 
