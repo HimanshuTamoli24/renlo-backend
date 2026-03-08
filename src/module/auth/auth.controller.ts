@@ -48,8 +48,9 @@ export const login = asyncHandler(async (req: Request, res: Response) => {
 });
 
 export const logout = asyncHandler(async (req: Request, res: Response) => {
-  console.log('Logging out user:', req.user);
-  await authService.logout(req.user.id);
+  const { _id } = req.body;
+  console.log('Logging out user:', _id);
+  await authService.logout(_id);
   res.clearCookie('accessToken');
   res.clearCookie('refreshToken');
   res.clearCookie('userRole');

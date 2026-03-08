@@ -5,7 +5,6 @@ import { ApiResponse } from '../../utils/api.response';
 
 export const getListings = asyncHandler(async (req: Request, res: Response) => {
   const result = await listingService.getListings(req.query);
-  console.log('listing controller', result);
   res.status(200).json(new ApiResponse('Listings fetched successfully', result.data, result.meta));
 });
 

@@ -33,7 +33,6 @@ export const login = async (data: any) => {
   if (!user) throw new ApiError(401, 'Invalid credentials');
 
   const isMatch = await user.comparePassword(data.password);
-  console.log('Password Match:', isMatch);
   if (!isMatch) throw new ApiError(401, 'Invalid credentials');
 
   const accessToken = generateAccessToken({ id: user._id, role: user.role });
@@ -57,7 +56,6 @@ export const refreshAccessToken = async (refreshToken: string) => {
   }
 
   const user = await User.findById(decoded.id).select('+refreshToken');
-  console.log('Decoded Refresh Token:', decoded, user);
   if (!user) throw new ApiError(401, 'Invalid refresh token');
 
   if (!user.refreshToken || user.refreshToken !== refreshToken) {
@@ -74,6 +72,7 @@ export const refreshAccessToken = async (refreshToken: string) => {
 
 export const logout = async (userId: string) => {
   const user = await User.findById(userId).select('+refreshToken');
+  console.log('Logging out user:', userId);
   if (!user) throw new ApiError(404, 'User not found');
   user.refreshToken = undefined;
   user.refreshTokenExpiry = undefined;

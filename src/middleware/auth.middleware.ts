@@ -20,9 +20,9 @@ function authorize() {
     const cookieToken = getCookieValue(req.headers.cookie, 'accessToken');
 
     const token = bearerToken || cookieToken;
-    console.log('Authorization Header:', header);
-    console.log('Bearer Token:', bearerToken);
-    console.log('Cookie Token:', cookieToken);
+    // console.log('Authorization Header:', header);
+    // console.log('Bearer Token:', bearerToken);
+    // console.log('Cookie Token:', cookieToken);
     if (!token) {
       return res.status(401).json({ message: 'Unauthorized' });
     }
